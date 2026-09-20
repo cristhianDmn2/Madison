@@ -21,7 +21,7 @@
       font-family: 'Fredoka', 'Comic Sans MS', sans-serif;
       color: var(--texto-oscuro);
       position: relative;
-      overflow-x: hidden; /* Evita scroll horizontal no deseado */
+      overflow-x: hidden;
     }
 
     :root {
@@ -229,7 +229,6 @@
       transform: translateY(6px); box-shadow: 0 0px 0px #C62828;
     }
 
-    /* --- GALERÍA FULL WIDTH --- */
     .galeria-full { 
       background-color: var(--blanco); 
       padding-left: 0;
@@ -248,14 +247,14 @@
       height: auto;
       max-height: 90vh;
       object-fit: cover;
-      border-radius: 0; /* Sin bordes redondeados para pantalla completa */
+      border-radius: 0;
       margin-bottom: 20px;
-      box-shadow: none; /* Sin sombra para efecto limpio */
+      box-shadow: none;
       border: none;
       display: block;
     }
 
-    /* --- CARRUSEL --- */
+    /* --- CARRUSEL DESLIZABLE --- */
     .carrusel-container {
       width: 100%;
       overflow: hidden;
@@ -270,15 +269,14 @@
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       padding: 0 20px 20px 20px;
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
+      scroll-behavior: smooth;
     }
 
-    .carrusel-track::-webkit-scrollbar {
-      display: none; /* Chrome/Safari */
-    }
+    .carrusel-track::-webkit-scrollbar { display: none; }
 
     .carrusel-item {
-      flex: 0 0 85%; /* Ocupa el 85% del ancho para ver parte de la siguiente */
+      flex: 0 0 85%;
       max-width: 500px;
       scroll-snap-align: center;
       border-radius: 20px;
@@ -289,30 +287,230 @@
     }
 
     .carrusel-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
     }
 
     .carrusel-indicadores {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 10px;
+      display: flex; justify-content: center;
+      gap: 8px; margin-top: 10px;
     }
 
     .carrusel-indicadores .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #ccc;
-      transition: background 0.3s;
+      width: 10px; height: 10px;
+      border-radius: 50%; background: #ccc;
+      transition: background 0.3s, transform 0.3s;
+      cursor: pointer;
     }
 
     .carrusel-indicadores .dot.active {
       background: var(--rojo-fiesta);
-      transform: scale(1.2);
+      transform: scale(1.3);
+    }
+
+    /* =======================================================
+       CARRUSEL 3D COVERFLOW
+       ======================================================= */
+    .seccion-carrusel-3d {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 200% 200%;
+      animation: moverFondo3D 15s ease infinite;
+      padding: 80px 20px 100px 20px;
+      overflow: hidden;
+    }
+    @keyframes moverFondo3D {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .seccion-carrusel-3d .titulo-seccion {
+      color: var(--blanco);
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.3), 4px 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .seccion-carrusel-3d .subtitulo {
+      color: rgba(255,255,255,0.95);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .carousel-3d-wrapper {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .carousel-3d-container {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      perspective: 1200px;
+      perspective-origin: center center;
+    }
+
+    .carousel-3d-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    .card-3d {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 250px;
+      height: 350px;
+      margin: -175px 0 0 -125px;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  opacity 0.7s ease,
+                  box-shadow 0.7s ease,
+                  filter 0.7s ease;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      will-change: transform, opacity;
+      cursor: pointer;
+    }
+
+    .card-3d img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Estados de las tarjetas */
+    .card-3d.active {
+      transform: translateX(0) translateZ(80px) rotateY(0deg) scale(1);
+      opacity: 1;
+      z-index: 10;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 5px rgba(255,255,255,0.95), 0 0 40px rgba(255,255,255,0.4);
+      filter: brightness(1.05);
+    }
+
+    .card-3d.prev {
+      transform: translateX(-72%) translateZ(-180px) rotateY(45deg) scale(0.85);
+      opacity: 0.75;
+      z-index: 5;
+      filter: brightness(0.85);
+    }
+
+    .card-3d.next {
+      transform: translateX(72%) translateZ(-180px) rotateY(-45deg) scale(0.85);
+      opacity: 0.75;
+      z-index: 5;
+      filter: brightness(0.85);
+    }
+
+    .card-3d.hidden {
+      transform: translateX(0) translateZ(-450px) rotateY(0deg) scale(0.5);
+      opacity: 0;
+      z-index: 1;
+    }
+
+    /* Controles */
+    .carousel-3d-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .carousel-3d-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      border: none;
+      color: #764ba2;
+      font-size: 1.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      transition: all 0.25s ease;
+      line-height: 1;
+      padding-bottom: 4px;
+    }
+
+    .carousel-3d-btn:hover {
+      transform: scale(1.1);
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+
+    .carousel-3d-btn:active {
+      transform: scale(0.95);
+    }
+
+    .carousel-3d-dots {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .dot-3d {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: all 0.35s ease;
+      border: 2px solid transparent;
+    }
+
+    .dot-3d.active {
+      background: #fff;
+      transform: scale(1.4);
+      box-shadow: 0 0 12px rgba(255,255,255,0.9);
+    }
+
+    /* Indicador de progreso automático */
+    .carousel-3d-progress {
+      width: 100%;
+      max-width: 260px;
+      height: 4px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 4px;
+      margin: 18px auto 0 auto;
+      overflow: hidden;
+    }
+
+    .carousel-3d-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD54F, #FF5252);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    @media (max-width: 480px) {
+      .carousel-3d-container {
+        height: 420px;
+      }
+      .card-3d {
+        width: 210px;
+        height: 300px;
+        margin: -150px 0 0 -105px;
+      }
+      .card-3d.prev {
+        transform: translateX(-65%) translateZ(-160px) rotateY(40deg) scale(0.85);
+      }
+      .card-3d.next {
+        transform: translateX(65%) translateZ(-160px) rotateY(-40deg) scale(0.85);
+      }
+      .carousel-3d-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.5rem;
+      }
     }
 
     .seccion-videos { background-color: var(--amarillo-abeja); }
@@ -382,14 +580,10 @@
       .video-wrapper { max-width: 450px; }
     }
 
-    /* =======================================================
-       MENÚ FIJO SUPERIOR (Música + Flecha juntos)
-       ======================================================= */
     .fixed-menu {
       position: fixed;
       top: calc(10px + env(safe-area-inset-top, 0px));
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       width: 100%;
       display: flex;
       justify-content: space-between;
@@ -397,13 +591,10 @@
       padding: 0 15px;
       z-index: 999999;
       pointer-events: none;
-
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      -webkit-perspective: 1000px;
-      perspective: 1000px;
       will-change: transform;
     }
     .fixed-menu > * { pointer-events: auto; }
@@ -426,15 +617,12 @@
     }
 
     .scroll-arrow {
-      width: 45px;
-      height: 45px;
+      width: 45px; height: 45px;
       flex-shrink: 0;
       background: rgba(255, 255, 255, 0.95);
       border: 2px solid var(--naranja-dulce);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       color: var(--naranja-dulce);
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -453,7 +641,6 @@
       60% { transform: translateY(3px); }
     }
 
-    /* --- OVERLAY CONFETI --- */
     .confetti-overlay {
       position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh;
@@ -463,12 +650,11 @@
       transition: opacity 0.4s ease;
       pointer-events: none;
     }
-    .confetti-overlay .confetti-close,
     .confetti-overlay .confetti-message { pointer-events: auto; }
     .confetti-overlay.closing { opacity: 0; }
 
     .confetti-message {
-      position: fixed; top: 38%; left: 50%;
+      position: fixed; top: 45%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Chewy', cursive, sans-serif;
       font-size: 2rem; color: #FF5252;
@@ -481,24 +667,6 @@
       font-family: 'Fredoka', sans-serif;
       font-size: 1.1rem; color: #4E342E;
       font-weight: 700; display: block; margin-top: 8px;
-    }
-
-    .confetti-close {
-      position: fixed; top: 58%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: #FF5252; color: white;
-      border: 3px solid white;
-      padding: 14px 40px; border-radius: 50px;
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 700; font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 6px 0px #C62828, 0 10px 20px rgba(0,0,0,0.3);
-      z-index: 2147483647;
-      transition: transform 0.2s;
-    }
-    .confetti-close:active {
-      transform: translate(-50%, -50%) translateY(4px);
-      box-shadow: 0 2px 0px #C62828;
     }
 
     .confetti-piece { position: absolute; will-change: transform; }
@@ -580,14 +748,13 @@
       <p class="subtitulo">Momentos especiales de nuestra abejita 🐝✨</p>
     </div>
 
-    <!-- Fotos destacadas full width sin bordes -->
     <img class="foto-full reveal" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhlP0l0EeS63hbOeHCSLHBWZZwIVgIyWcj4ImsHsZGxy2L8y5EQ7YEqujlLsktzDH3hKIHZSQLafviqzBN0IubHjGmeTuSgNETicYr2BxKuCLGqs0QdUFeKvTkzlAhUcy_e6UZ0GdVPj3U-8HZUg0_bv_hYILy99qJQsB08zE1NXcCqYUZ3Ma8fqI2BSFJs/s1280/1000610174.jpg" alt="Foto de Madison 1">
 
     <img class="foto-full reveal delay-1" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4Xd6nPrgDwVfe2wD66MgSZ0fQu7oQdGTehChBtyAWLf_BSxwd-UQaqxplHYsi5O-MOMPVIApIMa9NfFsS2E9BvjNtWoi7qokM81hixoN29BEy4qwH2rNjo226u-7V-yd2o4AwD8QfDtnkGGhlHaAIldQrhLVOVN1vCLz7Zzp2n87kvlNJjVsnvj9s3kBs/s1280/1000610173.jpg" alt="Foto de Madison 2">
 
     <img class="foto-full reveal delay-2" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgB7rfjMMVvLv4cYPCzNuTCE5AKD__SMgQjhzdW98p3QEhuu1URPUAWQWomDyuMIVs3rGuO9fglpg7c5jJEij6lUk2YIBjRxOzn4YbdR5UXaKQgrTTzsQl2xNB7-ZpaYWU885qlAD_zTnZStqub9Mtt-85sV0LGOo4zIHXduyD991ZxPChXlsBv7fYLowa5/s1280/1000610170.jpg" alt="Foto de Madison 3">
 
-    <!-- Carrusel de imágenes -->
+    <!-- Carrusel deslizable -->
     <div class="reveal delay-2" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px;">
       <h3 style="font-family: 'Chewy', cursive; font-size: 2rem; color: var(--naranja-dulce); margin-bottom: 20px;">MÁS MOMENTOS 📸</h3>
       
@@ -607,11 +774,56 @@
           </div>
         </div>
         <div class="carrusel-indicadores" id="carruselIndicadores">
-          <span class="dot active"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+          <span class="dot" data-index="3"></span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       NUEVA SECCIÓN: CARRUSEL 3D COVERFLOW
+       ===================================================== -->
+  <section class="seccion-carrusel-3d">
+    <div class="reveal">
+      <h2 class="titulo-seccion">MÁS AVENTURAS 🌟</h2>
+      <p class="subtitulo">Desliza o toca las flechas para descubrir más momentos ✨</p>
+    </div>
+
+    <div class="carousel-3d-wrapper reveal delay-1">
+      <div class="carousel-3d-container">
+        <div class="carousel-3d-stage" id="carousel3dStage">
+          <div class="card-3d" data-index="0">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifZKUAWkglgBXn4c5K8Cx_6ZiPnFn-Y3BdF_GZeVFYhzgr4pSPqt19n26dv6DAp4LgpcLgh0QyCgNDhwSEs6d22Vwbsg2hKeVS9g-yoNLdaLMhDtSUnzLJKvZb7ELcVfAqpA3q_qtjM2iDekJ-Y-lC9a-qTWaAS_cyIQyn5A3uamkphmhgI7m7SIIntWKn/s1600/1000611125.jpg" alt="Momento 1">
+          </div>
+          <div class="card-3d" data-index="1">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEistijmq1bWqTUQwQy0dN0fB_2jPquVdP_9jffmIHZxofCv2VD1kOLTDmBxnOR243OB6-J6nNiw-Up3lMyemuqVG6o9euWRgQ4BfmIQoUXnQbqo8xU8H8uV9MBZPeXswf6_ntbVteNkME8GXGKkxM9e_v3vrvwoVPVx6zjwCViqCLUGVltx6EKVrplmB2yu/s1600/1000611132.jpg" alt="Momento 2">
+          </div>
+          <div class="card-3d" data-index="2">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgbrd1F7ffwm8GflCtW6AN1hKT2hwy_AIyE9wZDEluNIFzdtNQcv82YvYG_Aob4lu47N_ohtqXqe9kDqYqTwtuV6jaHEUtqwL2I7rbgKmK_mndy2pixvOhKWphyfiAvWED2pj9JdIa9U9neKQDVqbC0zkWpGrv74YmCFiDGh1prU_XKHyizwYtTIRvh5K4m/s1600/1000611136.jpg" alt="Momento 3">
+          </div>
+          <div class="card-3d" data-index="3">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjSfXY3Vi24H-gLpwVi1aUnESV5gY3WDLMwNcauDvnUiIwiV5jfMeinodIlIFrPebC3f1oVN14LEWXaLgHERhAsxJ0NB8mw6UmQ4QwTuRWIfOXkULgpftUiBuNyYPFZcGOmcWHoguuq2HKE0hd3vL7lagYiu_aKgyql1OtRd6UZnamblulk06OYHiOeGExn/s1600/1000611138.jpg" alt="Momento 4">
+          </div>
+          <div class="card-3d" data-index="4">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjs-2WzRLpPaVU-Q8q0iHHDmdETthh-YEKvuGzRd5-vYtGhxAmjvwNi_iSAFp_uz2pvXbTZ2CAun7X7_yprjAPXQ9xyY1yc4ToE35S8ZFLLB-Wz6thmCSrhPo_7g_vF7pE93bw5-cOBqLywM2QZ-hFqvn7Px18Qnhsz13gQqnApDYc9ZtNs0JGSDYMvunle/s1600/1000611130.jpg" alt="Momento 5">
+          </div>
+          <div class="card-3d" data-index="5">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhGSCHC4vqE2arX9m3CXtOsMiXLOr7N4maYAuAFXqrWhrpDjitZ7DRQb9jwJs_GTyuojxXlCrb4eP-E5_OO6BKOPDYQA20pLbijOuBaG9uvFhMEEM3jgRe6oCMFkTRllZZ5ukT374rG303IKEsFbuvR7_ufiGzRMRuTKo3Am8qinjxBeO5DlHmDLy2yshqG/s1600/1000611127.jpg" alt="Momento 6">
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-3d-controls">
+        <button class="carousel-3d-btn" onclick="prev3D()" aria-label="Anterior">‹</button>
+        <div class="carousel-3d-dots" id="carousel3dDots"></div>
+        <button class="carousel-3d-btn" onclick="next3D()" aria-label="Siguiente">›</button>
+      </div>
+
+      <div class="carousel-3d-progress">
+        <div class="carousel-3d-progress-bar" id="carousel3dProgress"></div>
       </div>
     </div>
   </section>
@@ -720,7 +932,6 @@
     function confirmarConConfeti() {
       if (overlayActivo) return;
       overlayActivo = true;
-
       document.body.classList.add('overlay-open');
 
       const overlay = document.createElement('div');
@@ -731,12 +942,6 @@
       mensaje.className = 'confetti-message';
       mensaje.innerHTML = '🎉 ¡Gracias por confirmar! 🎉<span>Abriendo WhatsApp...</span>';
       overlay.appendChild(mensaje);
-
-      const btnCerrar = document.createElement('button');
-      btnCerrar.className = 'confetti-close';
-      btnCerrar.innerText = '✕ Cerrar';
-      btnCerrar.onclick = () => limpiarOverlay();
-      overlay.appendChild(btnCerrar);
 
       document.body.appendChild(overlay);
 
@@ -808,10 +1013,8 @@
         if (callback) callback();
         return;
       }
-
       clearTimeout(tiempoLimpiar);
       overlay.classList.add('closing');
-
       setTimeout(() => {
         if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
         overlayActivo = false;
@@ -828,20 +1031,270 @@
 
     window.addEventListener('pageshow', () => { limpiarOverlay(); });
 
-    // 6. CARRUSEL - Indicadores
+    // 6. CARRUSEL DESLIZABLE (el de arriba)
     const track = document.getElementById('carruselTrack');
     const dots = document.querySelectorAll('#carruselIndicadores .dot');
-    
-    if (track && dots.length > 0) {
+    const items = track ? track.querySelectorAll('.carrusel-item') : [];
+    let currentIndex = 0;
+    let autoScrollInterval;
+    let userInteracting = false;
+    const AUTO_SCROLL_DELAY = 3500;
+
+    function getItemWidth() {
+      if (!items.length) return 0;
+      const item = items[0];
+      const gap = 15;
+      return item.offsetWidth + gap;
+    }
+
+    function updateDots(index) {
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    function goToSlide(index) {
+      if (!track || !items.length) return;
+      currentIndex = index % items.length;
+      if (currentIndex < 0) currentIndex = items.length - 1;
+      const itemWidth = getItemWidth();
+      track.scrollTo({ left: currentIndex * itemWidth, behavior: 'smooth' });
+      updateDots(currentIndex);
+    }
+
+    function startAutoScroll() {
+      stopAutoScroll();
+      autoScrollInterval = setInterval(() => {
+        if (!userInteracting) goToSlide(currentIndex + 1);
+      }, AUTO_SCROLL_DELAY);
+    }
+
+    function stopAutoScroll() {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+        autoScrollInterval = null;
+      }
+    }
+
+    if (track && items.length > 0) {
+      setTimeout(() => {
+        goToSlide(0);
+        startAutoScroll();
+      }, 500);
+
+      track.addEventListener('touchstart', () => {
+        userInteracting = true;
+        stopAutoScroll();
+      }, { passive: true });
+
+      track.addEventListener('touchend', () => {
+        userInteracting = false;
+        setTimeout(() => { if (!userInteracting) startAutoScroll(); }, 3000);
+      }, { passive: true });
+
+      let scrollTimeout;
       track.addEventListener('scroll', () => {
-        const items = track.querySelectorAll('.carrusel-item');
-        const itemWidth = items[0].offsetWidth + 15; // ancho + gap
-        const scrollLeft = track.scrollLeft;
-        const activeIndex = Math.round(scrollLeft / itemWidth);
-        
-        dots.forEach((dot, index) => {
-          dot.classList.toggle('active', index === activeIndex);
+        const itemWidth = getItemWidth();
+        if (itemWidth > 0) {
+          const newIndex = Math.round(track.scrollLeft / itemWidth);
+          if (newIndex !== currentIndex) {
+            currentIndex = newIndex;
+            updateDots(currentIndex);
+          }
+        }
+        if (!userInteracting) {
+          userInteracting = true;
+          stopAutoScroll();
+        }
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          userInteracting = false;
+          if (!autoScrollInterval) startAutoScroll();
+        }, 2500);
+      }, { passive: true });
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+          userInteracting = true;
+          stopAutoScroll();
+          setTimeout(() => {
+            userInteracting = false;
+            startAutoScroll();
+          }, 3000);
         });
+      });
+    }
+
+    // =======================================================
+    // 7. CARRUSEL 3D COVERFLOW
+    // =======================================================
+    const cards3D = document.querySelectorAll('.card-3d');
+    const stage3D = document.getElementById('carousel3dStage');
+    const dots3DContainer = document.getElementById('carousel3dDots');
+    const progress3D = document.getElementById('carousel3dProgress');
+    let current3D = 0;
+    let auto3DTimer = null;
+    const AUTO_3D_DELAY = 4000; // 4 segundos por slide
+    let progressInterval = null;
+    let progressValue = 0;
+    let userPaused3D = false;
+
+    // Generar dots dinámicamente
+    cards3D.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = 'dot-3d' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => {
+        goTo3D(i);
+        pauseAuto3D();
+      });
+      dots3DContainer.appendChild(dot);
+    });
+
+    const dots3D = document.querySelectorAll('.dot-3d');
+
+    function update3D() {
+      cards3D.forEach((card, i) => {
+        card.classList.remove('active', 'prev', 'next', 'hidden');
+        const diff = (i - current3D + cards3D.length) % cards3D.length;
+        if (diff === 0) card.classList.add('active');
+        else if (diff === 1) card.classList.add('next');
+        else if (diff === cards3D.length - 1) card.classList.add('prev');
+        else card.classList.add('hidden');
+      });
+      dots3D.forEach((d, i) => {
+        d.classList.toggle('active', i === current3D);
+      });
+    }
+
+    function next3D() {
+      current3D = (current3D + 1) % cards3D.length;
+      update3D();
+      pauseAuto3D();
+    }
+
+    function prev3D() {
+      current3D = (current3D - 1 + cards3D.length) % cards3D.length;
+      update3D();
+      pauseAuto3D();
+    }
+
+    function goTo3D(index) {
+      current3D = index;
+      update3D();
+      resetProgress();
+    }
+
+    // Progreso visual
+    function resetProgress() {
+      progressValue = 0;
+      if (progress3D) progress3D.style.width = '0%';
+    }
+
+    function startProgress() {
+      resetProgress();
+      if (progressInterval) clearInterval(progressInterval);
+      const step = 100 / (AUTO_3D_DELAY / 50);
+      progressInterval = setInterval(() => {
+        if (!userPaused3D) {
+          progressValue += step;
+          if (progressValue >= 100) progressValue = 100;
+          if (progress3D) progress3D.style.width = progressValue + '%';
+        }
+      }, 50);
+    }
+
+    function startAuto3D() {
+      stopAuto3D();
+      userPaused3D = false;
+      startProgress();
+      auto3DTimer = setInterval(() => {
+        if (!userPaused3D) {
+          current3D = (current3D + 1) % cards3D.length;
+          update3D();
+          resetProgress();
+        }
+      }, AUTO_3D_DELAY);
+    }
+
+    function stopAuto3D() {
+      if (auto3DTimer) {
+        clearInterval(auto3DTimer);
+        auto3DTimer = null;
+      }
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+    }
+
+    function pauseAuto3D() {
+      userPaused3D = true;
+      stopAuto3D();
+      resetProgress();
+      // Reanudar después de 6 segundos de inactividad
+      clearTimeout(window._resume3D);
+      window._resume3D = setTimeout(() => {
+        startAuto3D();
+      }, 6000);
+    }
+
+    // Inicializar
+    if (cards3D.length > 0) {
+      update3D();
+      startAuto3D();
+
+      // Click en tarjetas laterales para navegar
+      cards3D.forEach((card, i) => {
+        card.addEventListener('click', () => {
+          if (i === current3D) return;
+          goTo3D(i);
+          pauseAuto3D();
+        });
+      });
+
+      // Swipe táctil
+      let startX3D = 0;
+      let startY3D = 0;
+      let isSwiping3D = false;
+
+      stage3D.addEventListener('touchstart', (e) => {
+        startX3D = e.touches[0].clientX;
+        startY3D = e.touches[0].clientY;
+        isSwiping3D = false;
+      }, { passive: true });
+
+      stage3D.addEventListener('touchmove', (e) => {
+        if (isSwiping3D) return;
+        const diffX = Math.abs(e.touches[0].clientX - startX3D);
+        const diffY = Math.abs(e.touches[0].clientY - startY3D);
+        if (diffX > diffY && diffX > 20) {
+          isSwiping3D = true;
+        }
+      }, { passive: true });
+
+      stage3D.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].clientX - startX3D;
+        if (Math.abs(diff) > 50) {
+          if (diff < 0) next3D();
+          else prev3D();
+        }
+      }, { passive: true });
+
+      // Pausar al pasar el mouse por encima (desktop)
+      stage3D.addEventListener('mouseenter', () => {
+        if (!userPaused3D) {
+          userPaused3D = true;
+          stopAuto3D();
+        }
+      });
+
+      stage3D.addEventListener('mouseleave', () => {
+        if (userPaused3D) {
+          userPaused3D = false;
+          startAuto3D();
+        }
       });
     }
   </script>
