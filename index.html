@@ -1435,7 +1435,7 @@
       });
     }
     
-         // =======================================================
+    // =======================================================
     // 8. ABEJITA INTERACTIVA - DRAG & THROW
     // =======================================================
     (function beeBouncerInit() {
@@ -1443,14 +1443,17 @@
       if (!bee) return;
 
       // === Configuración ===
-      const BEE_SIZE = 70;            // Tamaño (debe coincidir con CSS)
-      const IDLE_SPEED = 0.6;         // Velocidad cuando flota sola (lenta)
-      const FRICTION = 0.995;         // Fricción del aire (0.99 = mucha, 0.999 = poca)
-      const MIN_SPEED = 0.15;         // Velocidad mínima para dejar de moverse
-      const GRAVITY = 0.08;           // Gravedad al soltar (0 = sin gravedad)
-      const MAX_THROW_SPEED = 22;     // Velocidad máxima al lanzar
-      const APPEAR_DELAY = 4000;      // Reaparece cada 4s si la tocan
-      const VISIBLE_DURATION = 20000; // Tiempo máximo visible (20s)
+      const BEE_SIZE = 70;
+      const IDLE_SPEED = 0.5;         // Velocidad flotando (lenta)
+      const FRICTION = 0.992;         // Fricción del aire
+      const MIN_SPEED = 0.15;
+      const GRAVITY = 0.22;           // Gravedad (más = cae más rápido)
+      const FLOOR_BOUNCE = 0.62;      // Rebote contra el suelo
+      const WALL_BOUNCE = 0.75;       // Rebote contra paredes/techo
+      const MAX_THROW_SPEED = 20;
+      const APPEAR_DELAY = 4000;
+      const VISIBLE_DURATION = 25000;
+      const STOP_THRESHOLD = 0.6;
 
       let x = 0, y = 0;
       let vx = 0, vy = 0;
@@ -1459,35 +1462,35 @@
       let animId = null;
       let appearTimer = null;
       let hideTimer = null;
+      let autoExplodeTimer = null;
 
-      // Para detectar tap vs drag
+      // Para tap vs drag
       let pointerDownTime = 0;
       let pointerDownX = 0;
       let pointerDownY = 0;
       let dragOffsetX = 0;
       let dragOffsetY = 0;
-      let lastPointerX = 0;
-      let lastPointerY = 0;
-      let lastPointerTime = 0;
       let dragHistory = [];
       let hasMoved = false;
 
+      // Rebotes de borde desde el último lanzamiento
+      let edgeBounceCount = 0;
+      let randomExplodeTarget = 0;
+
       // === Utilidades ===
       function getMaxX() { return window.innerWidth - BEE_SIZE; }
-      function getMaxY() { return window.innerHeight - BEE_SIZE - 70; } // 70 = espacio arriba
-      function getMinY() { return 70; } // deja espacio para el menú superior
+      function getMaxY() { return window.innerHeight - BEE_SIZE - 70; }
+      function getMinY() { return 70; }
 
       function resetPosition() {
-        const w = getMaxX();
-        const h = getMaxY() - getMinY();
-        x = Math.random() * w;
-        y = getMinY() + Math.random() * h;
+        x = Math.random() * getMaxX();
+        y = getMinY() + Math.random() * (getMaxY() - getMinY());
 
-        // Velocidad inicial suave y aleatoria
         const angle = Math.random() * Math.PI * 2;
         vx = Math.cos(angle) * IDLE_SPEED;
         vy = Math.sin(angle) * IDLE_SPEED;
 
+        edgeBounceCount = 0;
         applyPosition();
       }
 
@@ -1503,7 +1506,7 @@
           return;
         }
 
-        // Aplicar gravedad al soltar
+        // Aplicar gravedad
         vy += GRAVITY;
 
         // Aplicar fricción
@@ -1514,35 +1517,50 @@
         x += vx;
         y += vy;
 
-        // Rebote horizontal
+        // --- Rebotes de BORDES (con sonido) ---
+        // Pared izquierda
         if (x <= 0) {
           x = 0;
-          vx = Math.abs(vx) * 0.7;
-          playBoing();
-        } else if (x >= getMaxX()) {
+          vx = Math.abs(vx) * WALL_BOUNCE;
+          registerEdgeBounce();
+        }
+        // Pared derecha
+        else if (x >= getMaxX()) {
           x = getMaxX();
-          vx = -Math.abs(vx) * 0.7;
-          playBoing();
+          vx = -Math.abs(vx) * WALL_BOUNCE;
+          registerEdgeBounce();
         }
 
-        // Rebote vertical (con techo y piso)
+        // Techo
         if (y <= getMinY()) {
           y = getMinY();
-          vy = Math.abs(vy) * 0.7;
-          playBoing();
-        } else if (y >= getMaxY()) {
+          vy = Math.abs(vy) * WALL_BOUNCE;
+          registerEdgeBounce();
+        }
+        // Suelo (SIN sonido en rebotes suaves)
+        else if (y >= getMaxY()) {
           y = getMaxY();
-          vy = -Math.abs(vy) * 0.7;
-          playBoing();
+          if (Math.abs(vy) > 1.5) {
+            vy = -Math.abs(vy) * FLOOR_BOUNCE;
+            // Solo suena si el rebote es fuerte (primer golpe)
+            if (Math.abs(vy) > 3) playBoing();
+          } else {
+            vy = 0;
+          }
+          vx *= 0.92;
         }
 
-        // Si está muy lenta, dejarla flotar suave
+        // Flotación suave cuando está muy lenta
         const speed = Math.hypot(vx, vy);
         if (speed < MIN_SPEED && !isDragging) {
-          // Aplicar movimiento idle suave
-          const angle = Math.random() * Math.PI * 2;
-          vx += Math.cos(angle) * 0.15;
-          vy += Math.sin(angle) * 0.15;
+          if (y >= getMaxY() - 2) {
+            vx = 0;
+            vy = 0;
+          } else {
+            const angle = Math.random() * Math.PI * 2;
+            vx += Math.cos(angle) * 0.12;
+            vy += Math.sin(angle) * 0.12;
+          }
         }
 
         applyPosition();
@@ -1560,6 +1578,26 @@
         }
       }
 
+      // === Registrar rebote en borde ===
+      function registerEdgeBounce() {
+        playBoing();
+        edgeBounceCount++;
+
+        if (randomExplodeTarget > 0 && edgeBounceCount >= randomExplodeTarget) {
+          scheduleAutoExplode(400);
+        }
+      }
+
+      // === Explosión automática ===
+      function scheduleAutoExplode(delay) {
+        clearTimeout(autoExplodeTimer);
+        autoExplodeTimer = setTimeout(() => {
+          if (isActive && !isDragging) {
+            popBee();
+          }
+        }, delay);
+      }
+
       // === Sonido ===
       let audioCtx = null;
       function ensureAudio() {
@@ -1569,14 +1607,14 @@
       }
 
       function playBoing() {
-        if (!audioCtx) return;
+        if (!audioCtx || audioCtx.state === 'suspended') return;
         try {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.12);
-          gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, audioCtx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
@@ -1586,7 +1624,7 @@
       }
 
       function playPop() {
-        if (!audioCtx) return;
+        if (!audioCtx || audioCtx.state === 'suspended') return;
         try {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
@@ -1594,7 +1632,7 @@
           osc.frequency.setValueAtTime(880, audioCtx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.08);
           osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.25);
-          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
@@ -1606,6 +1644,14 @@
       // === Mostrar / ocultar ===
       function showBee() {
         resetPosition();
+
+        // 55% de probabilidad de explotar tras 4-5 rebotes de borde
+        if (Math.random() < 0.55) {
+          randomExplodeTarget = Math.floor(Math.random() * 2) + 4; // 4 o 5
+        } else {
+          randomExplodeTarget = 0;
+        }
+
         bee.classList.remove('popped');
         bee.classList.add('active');
         isActive = true;
@@ -1618,6 +1664,7 @@
         isActive = false;
         stopAnim();
         clearTimeout(hideTimer);
+        clearTimeout(autoExplodeTimer);
         bee.classList.remove('active', 'dragging');
         scheduleNext();
       }
@@ -1627,14 +1674,10 @@
         appearTimer = setTimeout(() => showBee(), APPEAR_DELAY);
       }
 
-      // === Detectar tap vs drag ===
+      // === Tap vs Drag ===
       function getPointerPos(e) {
-        if (e.touches && e.touches[0]) {
-          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        if (e.changedTouches && e.changedTouches[0]) {
-          return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-        }
+        if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        if (e.changedTouches && e.changedTouches[0]) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
         return { x: e.clientX, y: e.clientY };
       }
 
@@ -1646,20 +1689,16 @@
         pointerDownTime = Date.now();
         pointerDownX = pos.x;
         pointerDownY = pos.y;
-        lastPointerX = pos.x;
-        lastPointerY = pos.y;
-        lastPointerTime = Date.now();
         dragHistory = [{ x: pos.x, y: pos.y, t: Date.now() }];
         hasMoved = false;
 
-        // Calcular offset del click respecto a la abejita
         const rect = bee.getBoundingClientRect();
         dragOffsetX = pos.x - rect.left;
         dragOffsetY = pos.y - rect.top;
 
-        // Pausar animación mientras sostiene
         isDragging = true;
         stopAnim();
+        clearTimeout(autoExplodeTimer);
         bee.classList.add('dragging');
 
         e.preventDefault();
@@ -1672,28 +1711,18 @@
         const pos = getPointerPos(e);
         const now = Date.now();
 
-        // Detectar si se movió lo suficiente para considerarlo drag
         const dx = pos.x - pointerDownX;
         const dy = pos.y - pointerDownY;
         if (Math.hypot(dx, dy) > 8) hasMoved = true;
 
-        // Mover abejita a la posición del puntero
         x = pos.x - dragOffsetX;
         y = pos.y - dragOffsetY;
-
-        // Limitar dentro de la pantalla
         x = Math.max(0, Math.min(x, getMaxX()));
         y = Math.max(getMinY(), Math.min(y, getMaxY()));
-
         applyPosition();
 
-        // Guardar historial para calcular velocidad al soltar
         dragHistory.push({ x: pos.x, y: pos.y, t: now });
         if (dragHistory.length > 6) dragHistory.shift();
-
-        lastPointerX = pos.x;
-        lastPointerY = pos.y;
-        lastPointerTime = now;
       }
 
       function onPointerUp(e) {
@@ -1701,37 +1730,35 @@
         isDragging = false;
         bee.classList.remove('dragging');
 
-        const pos = getPointerPos(e);
-        const now = Date.now();
-
-        // Calcular velocidad del lanzamiento usando el historial
-        let throwVx = 0, throwVy = 0;
-
         if (hasMoved && dragHistory.length >= 2) {
-          // Usar los últimos 3 puntos para calcular velocidad
           const recent = dragHistory.slice(-3);
           const first = recent[0];
           const last = recent[recent.length - 1];
-          const dt = (last.t - first.t) / 1000; // segundos
+          const dt = (last.t - first.t) / 1000;
 
           if (dt > 0.01) {
-            throwVx = (last.x - first.x) / dt * 0.15; // factor para ajustar
-            throwVy = (last.y - first.y) / dt * 0.15;
+            vx = (last.x - first.x) / dt * 0.15;
+            vy = (last.y - first.y) / dt * 0.15;
           }
 
-          // Limitar velocidad máxima
-          const speed = Math.hypot(throwVx, throwVy);
+          const speed = Math.hypot(vx, vy);
           if (speed > MAX_THROW_SPEED) {
             const factor = MAX_THROW_SPEED / speed;
-            throwVx *= factor;
-            throwVy *= factor;
+            vx *= factor;
+            vy *= factor;
           }
 
-          vx = throwVx;
-          vy = throwVy;
+          edgeBounceCount = 0;
+
+          // 40% de probabilidad de explotar tras 3-5 rebotes
+          if (Math.random() < 0.4) {
+            randomExplodeTarget = Math.floor(Math.random() * 3) + 3;
+          } else {
+            randomExplodeTarget = 0;
+          }
+
           startAnim();
         } else {
-          // Fue un tap: explotar
           popBee();
         }
       }
@@ -1742,6 +1769,7 @@
         isActive = false;
         stopAnim();
         clearTimeout(hideTimer);
+        clearTimeout(autoExplodeTimer);
 
         const rect = bee.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
@@ -1781,7 +1809,6 @@
         }
 
         playPop();
-
         bee.classList.add('popped');
 
         setTimeout(() => {
@@ -1801,14 +1828,12 @@
       document.addEventListener('touchend', onPointerUp);
       document.addEventListener('touchcancel', onPointerUp);
 
-      // Ajustar posición al redimensionar
       window.addEventListener('resize', () => {
         x = Math.max(0, Math.min(x, getMaxX()));
         y = Math.max(getMinY(), Math.min(y, getMaxY()));
         applyPosition();
       });
 
-      // Iniciar
       setTimeout(() => showBee(), 2500);
     })();
   </script>
