@@ -1446,14 +1446,14 @@
       const BEE_SIZE = 70;
       const IDLE_SPEED = 0.5;         // Velocidad flotando (lenta)
       const FRICTION = 0.992;         // Fricción del aire
-      const MIN_SPEED = 0.15;
+      const MIN_SPEED = 0.4;          // Si baja de esto, se le da un empujoncito suave
+      const IDLE_BOOST = 0.25;        // Fuerza del empujón al flotar (evita que se quede quieta)
       const GRAVITY = 0.22;           // Gravedad (más = cae más rápido)
-      const FLOOR_BOUNCE = 0.62;      // Rebote contra el suelo
+      const FLOOR_BOUNCE = 0.55;      // Rebote contra el suelo
       const WALL_BOUNCE = 0.75;       // Rebote contra paredes/techo
       const MAX_THROW_SPEED = 20;
       const APPEAR_DELAY = 4000;
       const VISIBLE_DURATION = 25000;
-      const STOP_THRESHOLD = 0.6;
 
       let x = 0, y = 0;
       let vx = 0, vy = 0;
@@ -1477,6 +1477,9 @@
       let edgeBounceCount = 0;
       let randomExplodeTarget = 0;
 
+      // Tiempo desde que fue lanzada (para dejar de aplicar gravedad después de un rato)
+      let timeSinceThrow = 0;
+
       // === Utilidades ===
       function getMaxX() { return window.innerWidth - BEE_SIZE; }
       function getMaxY() { return window.innerHeight - BEE_SIZE - 70; }
@@ -1486,11 +1489,13 @@
         x = Math.random() * getMaxX();
         y = getMinY() + Math.random() * (getMaxY() - getMinY());
 
+        // Aparece con velocidad suave y aleatoria (flotando)
         const angle = Math.random() * Math.PI * 2;
         vx = Math.cos(angle) * IDLE_SPEED;
         vy = Math.sin(angle) * IDLE_SPEED;
 
         edgeBounceCount = 0;
+        timeSinceThrow = 0;
         applyPosition();
       }
 
@@ -1506,8 +1511,12 @@
           return;
         }
 
-        // Aplicar gravedad
-        vy += GRAVITY;
+        // Aplicar gravedad solo si fue lanzada recientemente
+        // Después de un tiempo, la abejita "recupera vuelo" y flota
+        timeSinceThrow++;
+        if (timeSinceThrow < 90) { // ~1.5 segundos después de lanzar
+          vy += GRAVITY;
+        }
 
         // Aplicar fricción
         vx *= FRICTION;
@@ -1518,48 +1527,46 @@
         y += vy;
 
         // --- Rebotes de BORDES (con sonido) ---
-        // Pared izquierda
         if (x <= 0) {
           x = 0;
           vx = Math.abs(vx) * WALL_BOUNCE;
           registerEdgeBounce();
-        }
-        // Pared derecha
-        else if (x >= getMaxX()) {
+        } else if (x >= getMaxX()) {
           x = getMaxX();
           vx = -Math.abs(vx) * WALL_BOUNCE;
           registerEdgeBounce();
         }
 
-        // Techo
         if (y <= getMinY()) {
           y = getMinY();
           vy = Math.abs(vy) * WALL_BOUNCE;
           registerEdgeBounce();
         }
-        // Suelo (SIN sonido en rebotes suaves)
+        // Suelo: rebote suave
         else if (y >= getMaxY()) {
           y = getMaxY();
           if (Math.abs(vy) > 1.5) {
             vy = -Math.abs(vy) * FLOOR_BOUNCE;
-            // Solo suena si el rebote es fuerte (primer golpe)
             if (Math.abs(vy) > 3) playBoing();
           } else {
-            vy = 0;
+            // En vez de quedarse quieta, la empujamos hacia arriba
+            vy = -IDLE_SPEED;
+            vx += (Math.random() - 0.5) * 0.4;
           }
-          vx *= 0.92;
         }
 
-        // Flotación suave cuando está muy lenta
+        // === Flotación automática ===
+        // Si la velocidad es muy baja, le damos un empujón suave aleatorio
+        // para que nunca se quede quieta (ni en el suelo ni en el aire)
         const speed = Math.hypot(vx, vy);
         if (speed < MIN_SPEED && !isDragging) {
-          if (y >= getMaxY() - 2) {
-            vx = 0;
-            vy = 0;
-          } else {
-            const angle = Math.random() * Math.PI * 2;
-            vx += Math.cos(angle) * 0.12;
-            vy += Math.sin(angle) * 0.12;
+          const angle = Math.random() * Math.PI * 2;
+          vx += Math.cos(angle) * IDLE_BOOST;
+          vy += Math.sin(angle) * IDLE_BOOST;
+
+          // Si está pegada al suelo, empujarla hacia arriba siempre
+          if (y >= getMaxY() - 3) {
+            vy = -Math.abs(vy) - 0.3;
           }
         }
 
@@ -1749,6 +1756,7 @@
           }
 
           edgeBounceCount = 0;
+          timeSinceThrow = 0; // Reiniciar el contador de gravedad
 
           // 40% de probabilidad de explotar tras 3-5 rebotes
           if (Math.random() < 0.4) {
