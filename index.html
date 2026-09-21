@@ -163,6 +163,32 @@
       100% { background-position: 0% 50%; }
     }
 
+    /* ===== NUEVA PORTADA ===== */
+    .portada {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 20px auto;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25), 0 0 0 6px var(--blanco), 0 0 0 10px var(--naranja-dulce);
+      position: relative;
+      z-index: 2;
+      animation: entradaPortada 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .portada img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      aspect-ratio: 1 / 1;
+    }
+    @keyframes entradaPortada {
+      0% { transform: scale(0.5) translateY(60px) rotate(-5deg); opacity: 0; }
+      60% { transform: scale(1.05) translateY(-8px) rotate(2deg); opacity: 1; }
+      100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+    }
+    /* ========================= */
+
     .decoracion {
       position: absolute; font-size: 2.5rem;
       animation: flotar 4s ease-in-out infinite alternate;
@@ -1016,6 +1042,13 @@
     <div class="abeja-principal">
       <img class="bee-img" src="https://em-content.zobj.net/source/google/387/honeybee_1f41d.png" alt="abejita">
     </div>
+
+    <!-- ===== NUEVA PORTADA DE MADISON ===== -->
+    <div class="portada">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6Ubtyb_g71gl767FUHiD_uY0nSxf5fzg1ZFxKPRklkVbZlac9PNT92M2d2kz55v4JxTsuqlSg2am35s0M4kMLNGNfGoP_hwJgVW9YxbELo_yKMaxriYSU8EGLHNqlmW7i8gcVihycfEoYHlgKvQkOXheCh5MthG60nqdp55wwfwjtDRmSmRi41MRCnGVP/s1424/1000611425.jpg" alt="Portada de Madison">
+    </div>
+    <!-- ===================================== -->
+
     <h2>¡Nuestra abejita Madison cumple 1 añito! 🐝✨</h2>
     <h1>MADISON</h1>
     <p>Volando alto entre margaritas y sonrisas, este año estuvo lleno de dulzura. Queremos celebrar este día tan especial con ustedes.</p>
@@ -1055,24 +1088,71 @@
     </div>
   </section>
 
+  <!-- =====================================================
+       SECCIÓN "UN AÑO DE DIVERSIÓN" ACTUALIZADA CON CARRUSEL 3D
+       ===================================================== -->
   <section class="galeria-full">
     <div class="reveal">
       <h2 class="titulo-seccion">UN AÑO DE DIVERSIÓN</h2>
       <p class="subtitulo">Momentos especiales de nuestra abejita 🐝✨</p>
     </div>
 
-    <img class="foto-full reveal" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiu2bXfkMjDU4SHzC2-w1lZx01PUZgOSJOYRBb_0ZbS97pFAAIVvUL1h6u0zdhLLRlMbG3tp3QFfD7fQboOIltE2usGv8Y6MavKhLrQ1lrQ5yPE_6n9b8WGMc8KzR9r12JMGBe3O68e1DPg-Xbsl8i3U-xjXqNdxHu3uBmjU4KUWuKSBpuEcVPmHryxxQe5/s1152/1000610248.png" alt="Foto de Madison 1">
+    <!-- Carrusel 3D Coverflow para las 3 imágenes originales + 5 nuevas -->
+    <div class="reveal delay-1" style="width: 100%; max-width: 500px; margin: 0 auto;">
+      <div class="carousel-3d-wrapper">
+        <div class="carousel-3d-container">
+          <div class="carousel-3d-stage" id="galeriaStage">
+            
+            <!-- Imagen 1 (portada) -->
+            <div class="card-3d" data-index="0">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6Ubtyb_g71gl767FUHiD_uY0nSxf5fzg1ZFxKPRklkVbZlac9PNT92M2d2kz55v4JxTsuqlSg2am35s0M4kMLNGNfGoP_hwJgVW9YxbELo_yKMaxriYSU8EGLHNqlmW7i8gcVihycfEoYHlgKvQkOXheCh5MthG60nqdp55wwfwjtDRmSmRi41MRCnGVP/s1424/1000611425.jpg" alt="Portada Madison">
+            </div>
+            <!-- Imagen 2 -->
+            <div class="card-3d" data-index="1">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgB7rfjMMVvLv4cYPCzNuTCE5AKD__SMgQjhzdW98p3QEhuu1URPUAWQWomDyuMIVs3rGuO9fglpg7c5jJEij6lUk2YIBjRxOzn4YbdR5UXaKQgrTTzsQl2xNB7-ZpaYWU885qlAD_zTnZStqub9Mtt-85sV0LGOo4zIHXduyD991ZxPChXlsBv7fYLowa5/s1280/1000610170.jpg" alt="Foto Madison 2">
+            </div>
+            <!-- Imagen 3 -->
+            <div class="card-3d" data-index="2">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRwbuaMdzisUoUxM6Bnc5u8tfCeXDBwtvU0sAiyvQshAtPOmtuZRp3m98Ergq7ZWpzyJspjDWccEAQGnXeJLlFVqEETD00MKuUsn3Tf9n2HAFB0nSKEWxDD_PUjzkthynx2UjG7TXa4a_eE3ewVbJYCnXDzYtifUFUiIZ4tCPbBrZfxMeXIyy0vW0BeDqq/s1405/1000611391.jpg" alt="Foto Madison 3">
+            </div>
+            <!-- Imagen 4 (nueva) -->
+            <div class="card-3d" data-index="3">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVYVgV5lPyb9gPVWQcongMMQGh57MqAZu9NdV7rmgLZjNc3vdo4wDoYfaJ0N2L937DXV35Jv7ICiar-JCCkDGqzq2NPn5xSsgea1I2o87lZ2jqmFMQfnvPwEqDdilWh2F1QldCz6uOCRah9lwOrpL7-wUOUhUPogkE41GaojRFNld3dGgzT6VgG1DM3P-j/s1280/1000611449.jpg" alt="Foto Madison 4">
+            </div>
+            <!-- Imagen 5 (nueva) -->
+            <div class="card-3d" data-index="4">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgDTqvR10ZqcQHDAn4J0XyKU9mk6nYcqzv-1-iUMNsgUEotwEMYBlJvLpo3tES8bt8PVmcQGiCZ4zAmCNMQWTuwgUqnw2nEkzWRszqDMZpAYo-QKvVjzX4kU6phPg4rzHLJK25Lqe8-M5HCyRP-xWpfv3WYmvpibKRnOzI322FefjahsNjSLdLSGj9o-PIP/s1280/1000611452.jpg" alt="Foto Madison 5">
+            </div>
+            <!-- Imagen 6 (nueva) -->
+            <div class="card-3d" data-index="5">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIZfY37QzeMwfBpS4LR76zubIEthcySKZLhDbQUsDpgwPsVoze363Sc-TcMYel8UtrBXoDGvyHP4jEKvUGbp1k12cVaJLQJdBecp4HnXyZBEs62Em5bYdXf7RHqMG2I8rcsKe3NkXfMGyl24J0w-WKApT35AXk7ulGOEP7E5uCX_rwtNc4_-Pd3rbHmIeQ/s1280/1000611446.jpg" alt="Foto Madison 6">
+            </div>
+            <!-- Imagen 7 (nueva) -->
+            <div class="card-3d" data-index="6">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_HYuj-Ck4pKJ9VfmpsbmVKp7cKk4JAU7DVFX7bngZVKmTJfcBSpbXwFFxUM6Ofg3EBx-X84XSP2nN498vkyszojW0HQW4w-lTR70TkI9-1ozL_rx1WsqzSLyhQIn4UreBOxj3FJmlKbtlA8AXCWzkV5G7lApzhLeCwukuVwkRVIKm6c2rkGlBXJs0lWTq/s1280/1000611457.jpg" alt="Foto Madison 7">
+            </div>
+            <!-- Imagen 8 (nueva) -->
+            <div class="card-3d" data-index="7">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhZJtrDE_Wz3JTduA6-c6J07shTFKKq8e0vWOgJAiXpMjN4oV-5z2d5cj83KDyIlVzrQSyPTPEui74ePc4RA9XCaVQapTelZJXL8rgLODVLUWacEVrz0A5olHKZJv1ck1Vnff08GeWOvB-vYSMKWkrPcmBjQM2uKLWZrhFsGDQi7DBIFtrZ0BRE9k5IKhvc/s1600/1000611453.jpg" alt="Foto Madison 8">
+            </div>
 
+          </div>
+        </div>
 
-    <img class="foto-full reveal delay-2" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgB7rfjMMVvLv4cYPCzNuTCE5AKD__SMgQjhzdW98p3QEhuu1URPUAWQWomDyuMIVs3rGuO9fglpg7c5jJEij6lUk2YIBjRxOzn4YbdR5UXaKQgrTTzsQl2xNB7-ZpaYWU885qlAD_zTnZStqub9Mtt-85sV0LGOo4zIHXduyD991ZxPChXlsBv7fYLowa5/s1280/1000610170.jpg" alt="Foto de Madison 2">
-    
-       <img class="foto-full reveal delay-3" loading="lazy" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRwbuaMdzisUoUxM6Bnc5u8tfCeXDBwtvU0sAiyvQshAtPOmtuZRp3m98Ergq7ZWpzyJspjDWccEAQGnXeJLlFVqEETD00MKuUsn3Tf9n2HAFB0nSKEWxDD_PUjzkthynx2UjG7TXa4a_eE3ewVbJYCnXDzYtifUFUiIZ4tCPbBrZfxMeXIyy0vW0BeDqq/s1405/1000611391.jpg" alt="Foto de Madison 3">
-       
-        <img class="foto-full reveal delay-3" loading="lazy" src="
-https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0xE8fx9DQCSMYdOgS2K4Se4oO_5GdUWp9AK0U7Tb98BZdjt8McAiXYdz_1jzKNqNtnTBqLzwwN7MfeugfXnrRmQFiudRZZLe3klfKy0x6NTJwvh0MCP0iQ8LTjnC79XXxhGd4CIwLciJBvAmhSlt2nBmi_xADijAQfo266BVH7/s1280/1000611394.jpg" alt="Foto de Madison 4">
+        <div class="carousel-3d-controls">
+          <button class="carousel-3d-btn" onclick="galeriaPrev()" aria-label="Anterior">‹</button>
+          <div class="carousel-3d-dots" id="galeriaDots"></div>
+          <button class="carousel-3d-btn" onclick="galeriaNext()" aria-label="Siguiente">›</button>
+        </div>
 
-    <!-- Carrusel deslizable -->
-    <div class="reveal delay-2" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px;">
+        <div class="carousel-3d-progress">
+          <div class="carousel-3d-progress-bar" id="galeriaProgress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrusel deslizable original (se mantiene, ahora sin las 3 fotos grandes) -->
+    <div class="reveal delay-2" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 60px;">
       <h3 style="font-family: 'Chewy', cursive; font-size: 2rem; color: var(--naranja-dulce); margin-bottom: 20px;">MÁS MOMENTOS 📸</h3>
       
       <div class="carrusel-container">
@@ -1122,7 +1202,7 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
   </section>
 
   <!-- =====================================================
-       NUEVA SECCIÓN: CARRUSEL 3D COVERFLOW
+       SECCIÓN: CARRUSEL 3D COVERFLOW (MÁS AVENTURAS)
        ===================================================== -->
   <section class="seccion-carrusel-3d">
     <div class="reveal">
@@ -1387,7 +1467,7 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
 
     window.addEventListener('pageshow', () => { limpiarOverlay(); });
 
-    // 6. CARRUSEL DESLIZABLE (el de arriba)
+    // 6. CARRUSEL DESLIZABLE (el de abajo, "MÁS MOMENTOS")
     const track = document.getElementById('carruselTrack');
     const dots = document.querySelectorAll('#carruselIndicadores .dot');
     const items = track ? track.querySelectorAll('.carrusel-item') : [];
@@ -1483,9 +1563,9 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
     }
 
     // =======================================================
-    // 7. CARRUSEL 3D COVERFLOW
+    // 7. CARRUSEL 3D COVERFLOW PARA "MÁS AVENTURAS"
     // =======================================================
-    const cards3D = document.querySelectorAll('.card-3d');
+    const cards3D = document.querySelectorAll('#carousel3dStage .card-3d');
     const stage3D = document.getElementById('carousel3dStage');
     const dots3DContainer = document.getElementById('carousel3dDots');
     const progress3D = document.getElementById('carousel3dProgress');
@@ -1507,7 +1587,7 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
       dots3DContainer.appendChild(dot);
     });
 
-    const dots3D = document.querySelectorAll('.dot-3d');
+    const dots3D = document.querySelectorAll('#carousel3dDots .dot-3d');
 
     function update3D() {
       cards3D.forEach((card, i) => {
@@ -1646,7 +1726,172 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
         }
       });
     }
-    
+
+    // =======================================================
+    // 7b. CARRUSEL 3D PARA "UN AÑO DE DIVERSIÓN" (GALERÍA)
+    // =======================================================
+    const galeriaCards = document.querySelectorAll('#galeriaStage .card-3d');
+    const galeriaStage = document.getElementById('galeriaStage');
+    const galeriaDotsContainer = document.getElementById('galeriaDots');
+    const galeriaProgress = document.getElementById('galeriaProgress');
+    let galeriaCurrent = 0;
+    let galeriaAutoTimer = null;
+    const GALERIA_AUTO_DELAY = 3800;
+    let galeriaProgressInterval = null;
+    let galeriaProgressValue = 0;
+    let galeriaPaused = false;
+
+    galeriaCards.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.className = 'dot-3d' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', () => {
+        galeriaGoTo(i);
+        galeriaPause();
+      });
+      galeriaDotsContainer.appendChild(dot);
+    });
+
+    const galeriaDots = document.querySelectorAll('#galeriaDots .dot-3d');
+
+    function galeriaUpdate() {
+      galeriaCards.forEach((card, i) => {
+        card.classList.remove('active', 'prev', 'next', 'hidden');
+        const diff = (i - galeriaCurrent + galeriaCards.length) % galeriaCards.length;
+        if (diff === 0) card.classList.add('active');
+        else if (diff === 1) card.classList.add('next');
+        else if (diff === galeriaCards.length - 1) card.classList.add('prev');
+        else card.classList.add('hidden');
+      });
+      galeriaDots.forEach((d, i) => {
+        d.classList.toggle('active', i === galeriaCurrent);
+      });
+    }
+
+    function galeriaNext() {
+      galeriaCurrent = (galeriaCurrent + 1) % galeriaCards.length;
+      galeriaUpdate();
+      galeriaPause();
+    }
+
+    function galeriaPrev() {
+      galeriaCurrent = (galeriaCurrent - 1 + galeriaCards.length) % galeriaCards.length;
+      galeriaUpdate();
+      galeriaPause();
+    }
+
+    function galeriaGoTo(index) {
+      galeriaCurrent = index;
+      galeriaUpdate();
+      galeriaResetProgress();
+    }
+
+    function galeriaResetProgress() {
+      galeriaProgressValue = 0;
+      if (galeriaProgress) galeriaProgress.style.width = '0%';
+    }
+
+    function galeriaStartProgress() {
+      galeriaResetProgress();
+      if (galeriaProgressInterval) clearInterval(galeriaProgressInterval);
+      const step = 100 / (GALERIA_AUTO_DELAY / 50);
+      galeriaProgressInterval = setInterval(() => {
+        if (!galeriaPaused) {
+          galeriaProgressValue += step;
+          if (galeriaProgressValue >= 100) galeriaProgressValue = 100;
+          if (galeriaProgress) galeriaProgress.style.width = galeriaProgressValue + '%';
+        }
+      }, 50);
+    }
+
+    function galeriaStartAuto() {
+      galeriaStopAuto();
+      galeriaPaused = false;
+      galeriaStartProgress();
+      galeriaAutoTimer = setInterval(() => {
+        if (!galeriaPaused) {
+          galeriaCurrent = (galeriaCurrent + 1) % galeriaCards.length;
+          galeriaUpdate();
+          galeriaResetProgress();
+        }
+      }, GALERIA_AUTO_DELAY);
+    }
+
+    function galeriaStopAuto() {
+      if (galeriaAutoTimer) {
+        clearInterval(galeriaAutoTimer);
+        galeriaAutoTimer = null;
+      }
+      if (galeriaProgressInterval) {
+        clearInterval(galeriaProgressInterval);
+        galeriaProgressInterval = null;
+      }
+    }
+
+    function galeriaPause() {
+      galeriaPaused = true;
+      galeriaStopAuto();
+      galeriaResetProgress();
+      clearTimeout(window._resumeGaleria);
+      window._resumeGaleria = setTimeout(() => {
+        galeriaStartAuto();
+      }, 6000);
+    }
+
+    if (galeriaCards.length > 0) {
+      galeriaUpdate();
+      galeriaStartAuto();
+
+      galeriaCards.forEach((card, i) => {
+        card.addEventListener('click', () => {
+          if (i === galeriaCurrent) return;
+          galeriaGoTo(i);
+          galeriaPause();
+        });
+      });
+
+      let startXG = 0;
+      let startYG = 0;
+      let isSwipingG = false;
+
+      galeriaStage.addEventListener('touchstart', (e) => {
+        startXG = e.touches[0].clientX;
+        startYG = e.touches[0].clientY;
+        isSwipingG = false;
+      }, { passive: true });
+
+      galeriaStage.addEventListener('touchmove', (e) => {
+        if (isSwipingG) return;
+        const diffX = Math.abs(e.touches[0].clientX - startXG);
+        const diffY = Math.abs(e.touches[0].clientY - startYG);
+        if (diffX > diffY && diffX > 20) {
+          isSwipingG = true;
+        }
+      }, { passive: true });
+
+      galeriaStage.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].clientX - startXG;
+        if (Math.abs(diff) > 50) {
+          if (diff < 0) galeriaNext();
+          else galeriaPrev();
+        }
+      }, { passive: true });
+
+      galeriaStage.addEventListener('mouseenter', () => {
+        if (!galeriaPaused) {
+          galeriaPaused = true;
+          galeriaStopAuto();
+        }
+      });
+
+      galeriaStage.addEventListener('mouseleave', () => {
+        if (galeriaPaused) {
+          galeriaPaused = false;
+          galeriaStartAuto();
+        }
+      });
+    }
+
     // =======================================================
     // 8. ABEJITA INTERACTIVA - DRAG & THROW
     // =======================================================
