@@ -2070,6 +2070,7 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
 
       let hasScrolled = false;
       let hintInterval = null;
+      let hideTimeout = null;
 
       function updateScrollArrow() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -2078,12 +2079,10 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
 
         const atBottom = scrollTop + windowHeight >= documentHeight - 10;
 
-        /* Si llegó al final */
         if (atBottom) {
           arrow.classList.add('at-bottom');
           arrow.setAttribute('aria-label', 'Volver al principio');
           arrow.setAttribute('href', '#top');
-
           if (arrowPath) {
             arrowPath.setAttribute('d', 'M12 19V5M5 12l7-7 7 7');
           }
@@ -2091,48 +2090,58 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
           arrow.classList.remove('at-bottom');
           arrow.setAttribute('aria-label', 'Desplazarse hacia abajo');
           arrow.setAttribute('href', '#detalles');
-
           if (arrowPath) {
             arrowPath.setAttribute('d', 'M12 5v14M5 12l7 7 7-7');
           }
         }
       }
 
-      /* Mostrar el hint */
       function showHint() {
         if (!hint) return;
         hint.classList.remove('hidden');
       }
 
-      /* Ocultar el hint */
       function hideHint() {
         if (!hint) return;
         hint.classList.add('hidden');
       }
 
-      /* Ciclo del hint: muestra 4s, oculta 6s, repite cada 10s */
+      /* Ciclo: muestra al inicio, oculta a los 4s, vuelve a mostrar cada 10s */
       function startHintCycle() {
         // Limpiar cualquier ciclo previo
         if (hintInterval) clearInterval(hintInterval);
+        if (hideTimeout) clearTimeout(hideTimeout);
 
-        // Mostrar inmediatamente al inicio
+        // Mostrar inmediatamente
         showHint();
 
-        // Cada 10 segundos: mostrar de nuevo si no bajó
+        // Ocultar a los 4 segundos
+        hideTimeout = setTimeout(() => {
+          if (!hasScrolled) hideHint();
+        }, 4000);
+
+        // Cada 10 segundos volver a mostrar (si no bajó)
         hintInterval = setInterval(() => {
           if (hasScrolled) {
-            // Si ya bajó, detener el ciclo para siempre
             clearInterval(hintInterval);
             hintInterval = null;
+            if (hideTimeout) {
+              clearTimeout(hideTimeout);
+              hideTimeout = null;
+            }
             hideHint();
             return;
           }
+
+          // Mostrar de nuevo
           showHint();
 
-          // Ocultar a los 4 segundos de mostrarlo
-          setTimeout(() => {
+          // Y ocultar a los 4 segundos
+          if (hideTimeout) clearTimeout(hideTimeout);
+          hideTimeout = setTimeout(() => {
             if (!hasScrolled) hideHint();
           }, 4000);
+
         }, 10000);
       }
 
@@ -2157,7 +2166,6 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
       });
 
       window.addEventListener('scroll', function () {
-        // Detectar el primer scroll para detener el hint
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         if (scrollTop > 15 && !hasScrolled) {
           hasScrolled = true;
@@ -2166,13 +2174,16 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
             clearInterval(hintInterval);
             hintInterval = null;
           }
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+          }
         }
         updateScrollArrow();
       }, { passive: true });
 
       window.addEventListener('resize', updateScrollArrow);
 
-      /* Estado inicial */
       updateScrollArrow();
       startHintCycle();
     })();
