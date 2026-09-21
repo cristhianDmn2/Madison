@@ -838,6 +838,123 @@
       z-index: 9999999;
       will-change: transform, opacity;
     }
+/* =========================================================
+   FLECHA INTELIGENTE DE SCROLL + MENSAJE
+   ========================================================= */
+
+.scroll-arrow {
+  position: relative;
+  cursor: pointer;
+  overflow: visible !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Evita que la flecha se corte */
+.scroll-arrow svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  overflow: visible;
+  transition: none;
+}
+
+/* La flecha cambia de dirección al llegar abajo */
+.scroll-arrow.at-bottom svg {
+  transform: none;
+}
+
+/* =========================================================
+   MENSAJE "DESLIZÁ HACIA ABAJO"
+   AHORA APARECE A LA DERECHA DE LA FLECHA
+   ========================================================= */
+
+.scroll-hint {
+  position: absolute;
+
+  /* Sale hacia la derecha de la flecha */
+  left: calc(100% + 10px);
+  right: auto;
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: rgba(255, 255, 255, 0.97);
+  color: #333;
+
+  padding: 8px 12px;
+  border-radius: 18px;
+
+  white-space: nowrap;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+
+  pointer-events: none;
+  z-index: 999999;
+}
+
+/* Pico apuntando hacia la flecha */
+.scroll-hint::after {
+  content: "";
+
+  position: absolute;
+
+  left: -6px;
+  right: auto;
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 0;
+  height: 0;
+
+  border-right: 7px solid rgba(255,255,255,0.97);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+/* Ocultar después del primer scroll */
+.scroll-hint.hidden {
+  opacity: 0;
+  visibility: hidden;
+
+  transform:
+    translateY(-50%)
+    translateX(-8px);
+}
+
+/* =========================================================
+   EN PANTALLAS PEQUEÑAS
+   El mensaje se mantiene dentro de la pantalla
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .scroll-hint {
+    left: calc(100% + 8px);
+
+    font-size: 11px;
+    padding: 7px 10px;
+
+    max-width: 145px;
+    white-space: normal;
+    text-align: center;
+  }
+
+}
   </style>
 </head>
 <body>
@@ -846,13 +963,30 @@
          src="https://files.catbox.moe/w1r175.mp3"></audio>
 
   <div class="fixed-menu">
-    <a href="#detalles" class="scroll-arrow" aria-label="Desplazarse hacia abajo">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 5v14M19 12l-7 7-7-7"/>
-      </svg>
-    </a>
-    <button class="music-btn" id="music-toggle" onclick="toggleMusic()">🎵 Música</button>
-  </div>
+  <a href="#detalles"
+   class="scroll-arrow"
+   id="scrollArrow"
+   aria-label="Desplazarse hacia abajo">
+
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      id="arrowPath"
+      d="M12 5v14M5 12l7 7 7-7"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round">
+    </path>
+  </svg>
+
+  <span class="scroll-hint" id="scrollHint">
+    Deslizá hacia abajo
+  </span>
+</a>
+
+  <button class="music-btn" id="music-toggle" onclick="toggleMusic()">🎵 Música</button>
+</div>
 
   <div class="floating-bg">
     <div class="float-item"><img class="bee-img" src="https://em-content.zobj.net/source/google/387/honeybee_1f41d.png" alt=""></div>
@@ -1922,6 +2056,127 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
 
       setTimeout(() => showBee(), 2500);
     })();
+	
+	
+    // =======================================================
+    // 9. FLECHA INTELIGENTE DE SCROLL + MENSAJE "DESLIZÁ"
+    // =======================================================
+    (function () {
+      const arrow = document.getElementById('scrollArrow');
+      const hint = document.getElementById('scrollHint');
+      const arrowPath = document.getElementById('arrowPath');
+
+      if (!arrow) return;
+
+      let hasScrolled = false;
+      let hintInterval = null;
+
+      function updateScrollArrow() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        const atBottom = scrollTop + windowHeight >= documentHeight - 10;
+
+        /* Si llegó al final */
+        if (atBottom) {
+          arrow.classList.add('at-bottom');
+          arrow.setAttribute('aria-label', 'Volver al principio');
+          arrow.setAttribute('href', '#top');
+
+          if (arrowPath) {
+            arrowPath.setAttribute('d', 'M12 19V5M5 12l7-7 7 7');
+          }
+        } else {
+          arrow.classList.remove('at-bottom');
+          arrow.setAttribute('aria-label', 'Desplazarse hacia abajo');
+          arrow.setAttribute('href', '#detalles');
+
+          if (arrowPath) {
+            arrowPath.setAttribute('d', 'M12 5v14M5 12l7 7 7-7');
+          }
+        }
+      }
+
+      /* Mostrar el hint */
+      function showHint() {
+        if (!hint) return;
+        hint.classList.remove('hidden');
+      }
+
+      /* Ocultar el hint */
+      function hideHint() {
+        if (!hint) return;
+        hint.classList.add('hidden');
+      }
+
+      /* Ciclo del hint: muestra 4s, oculta 6s, repite cada 10s */
+      function startHintCycle() {
+        // Limpiar cualquier ciclo previo
+        if (hintInterval) clearInterval(hintInterval);
+
+        // Mostrar inmediatamente al inicio
+        showHint();
+
+        // Cada 10 segundos: mostrar de nuevo si no bajó
+        hintInterval = setInterval(() => {
+          if (hasScrolled) {
+            // Si ya bajó, detener el ciclo para siempre
+            clearInterval(hintInterval);
+            hintInterval = null;
+            hideHint();
+            return;
+          }
+          showHint();
+
+          // Ocultar a los 4 segundos de mostrarlo
+          setTimeout(() => {
+            if (!hasScrolled) hideHint();
+          }, 4000);
+        }, 10000);
+      }
+
+      arrow.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const atBottom = scrollTop + windowHeight >= documentHeight - 10;
+
+        if (atBottom) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const detalles = document.getElementById('detalles');
+          if (detalles) {
+            detalles.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+          }
+        }
+      });
+
+      window.addEventListener('scroll', function () {
+        // Detectar el primer scroll para detener el hint
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 15 && !hasScrolled) {
+          hasScrolled = true;
+          hideHint();
+          if (hintInterval) {
+            clearInterval(hintInterval);
+            hintInterval = null;
+          }
+        }
+        updateScrollArrow();
+      }, { passive: true });
+
+      window.addEventListener('resize', updateScrollArrow);
+
+      /* Estado inicial */
+      updateScrollArrow();
+      startHintCycle();
+    })();
+
   </script>
 </body>
 </html>
