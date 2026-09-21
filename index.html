@@ -15,7 +15,7 @@
 <!-- ===== FACEBOOK / WHATSAPP / MESSENGER - OPEN GRAPH ===== -->
 <meta property="og:title" content="¡1er Añito de Madison! 🐝✨">
 <meta property="og:description" content="Volando alto entre margaritas y sonrisas. ¡Acompáñanos a celebrar este día tan especial! 🐝💛">
-<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiu2bXfkMjDU4SHzC2-w1lZx01PUZgOSJOYRBb_0ZbS97pFAAIVvUL1h6u0zdhLLRlMbG3tp3QFfD7fQboOIltE2usGv8Y6MavKhLrQ1lrQ5yPE_6n9b8WGMc8KzR9r12JMGBe3O68e1DPg-Xbsl8i3U-xjXqNdxHu3uBmjU4KUWuKSBpuEcVPmHryxxQe5/s1152/1000610248.png">
+<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVpE2wY_pOZmBm5we-xZ1vEVyyTgZpPlbvf5nW7cy-16zFP73B-qmXlOwO-_X9cJBeTg4opqzKfbpxOQnh2amai4THG5gUfRbvPzUF3XTpSqH1g0sorbxzK1X_TbgaetG8BiO509JyGSRaXl8lsrXssoLSXPBIfy4cF6Nj7Vx8SoIzhWtVCo_2-QcWtI-k/s1424/1000611425.jpg">
 
 <!-- URL exacta de la página -->
 <meta property="og:url" content="https://cristhiandmn2.github.io/Madison/">
@@ -2058,7 +2058,7 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
     })();
 	
 	
-    // =======================================================
+        // =======================================================
     // 9. FLECHA INTELIGENTE DE SCROLL + MENSAJE "DESLIZÁ"
     // =======================================================
     (function () {
@@ -2066,11 +2066,11 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
       const hint = document.getElementById('scrollHint');
       const arrowPath = document.getElementById('arrowPath');
 
-      if (!arrow) return;
+      if (!arrow || !hint) return;
 
-      let hasScrolled = false;
       let hintInterval = null;
       let hideTimeout = null;
+      let stopHint = false;
 
       function updateScrollArrow() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -2097,41 +2097,42 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
       }
 
       function showHint() {
-        if (!hint) return;
+        if (stopHint) return;
         hint.classList.remove('hidden');
       }
 
       function hideHint() {
-        if (!hint) return;
         hint.classList.add('hidden');
       }
 
-      /* Ciclo: muestra al inicio, oculta a los 4s, vuelve a mostrar cada 10s */
+      function stopHintCycle() {
+        stopHint = true;
+        if (hintInterval) {
+          clearInterval(hintInterval);
+          hintInterval = null;
+        }
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+          hideTimeout = null;
+        }
+        hideHint();
+      }
+
       function startHintCycle() {
-        // Limpiar cualquier ciclo previo
         if (hintInterval) clearInterval(hintInterval);
         if (hideTimeout) clearTimeout(hideTimeout);
 
-        // Mostrar inmediatamente
+        // Mostrar al inicio
         showHint();
 
         // Ocultar a los 4 segundos
         hideTimeout = setTimeout(() => {
-          if (!hasScrolled) hideHint();
+          if (!stopHint) hideHint();
         }, 4000);
 
-        // Cada 10 segundos volver a mostrar (si no bajó)
+        // Cada 10 segundos volver a mostrar (se repite siempre)
         hintInterval = setInterval(() => {
-          if (hasScrolled) {
-            clearInterval(hintInterval);
-            hintInterval = null;
-            if (hideTimeout) {
-              clearTimeout(hideTimeout);
-              hideTimeout = null;
-            }
-            hideHint();
-            return;
-          }
+          if (stopHint) return;
 
           // Mostrar de nuevo
           showHint();
@@ -2139,14 +2140,15 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
           // Y ocultar a los 4 segundos
           if (hideTimeout) clearTimeout(hideTimeout);
           hideTimeout = setTimeout(() => {
-            if (!hasScrolled) hideHint();
+            if (!stopHint) hideHint();
           }, 4000);
-
         }, 10000);
       }
 
+      // Click en la flecha → detiene el hint para siempre
       arrow.addEventListener('click', function (e) {
         e.preventDefault();
+        stopHintCycle();
 
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
@@ -2165,19 +2167,14 @@ https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgEI8anNExET47Q2Wx7M0
         }
       });
 
+      // Scroll → solo detener si bajó bastante (media pantalla)
       window.addEventListener('scroll', function () {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        if (scrollTop > 15 && !hasScrolled) {
-          hasScrolled = true;
-          hideHint();
-          if (hintInterval) {
-            clearInterval(hintInterval);
-            hintInterval = null;
-          }
-          if (hideTimeout) {
-            clearTimeout(hideTimeout);
-            hideTimeout = null;
-          }
+        const windowHeight = window.innerHeight;
+
+        // Solo detener si bajó más de media pantalla
+        if (!stopHint && scrollTop > windowHeight * 0.5) {
+          stopHintCycle();
         }
         updateScrollArrow();
       }, { passive: true });
